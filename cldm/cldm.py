@@ -2,6 +2,7 @@ import einops
 import torch
 import torch as th
 import torch.nn as nn
+from torchvision.transforms import InterpolationMode
 
 from ldm.modules.diffusionmodules.util import (
     conv_nd,
@@ -17,6 +18,7 @@ from ldm.modules.diffusionmodules.openaimodel import UNetModel, TimestepEmbedSeq
 from ldm.models.diffusion.ddpm import LatentDiffusion
 from ldm.util import log_txt_as_img, exists, instantiate_from_config
 from ldm.models.diffusion.ddim import DDIMSampler
+import torchvision.transforms.functional as TF
 
 
 class ControlledUnetModel(UNetModel):
@@ -314,14 +316,34 @@ class ControlLDM(LatentDiffusion):
         self.only_mid_control = only_mid_control
         self.control_scales = [1.0] * 13
 
+    # def encode_image(self, x):
+    #     x = einops.rearrange(x, 'b h w c -> b c h w')
+    #     x = x.to(self.device)
+    #     encoder_posterior = self.encode_first_stage(x)
+    #     z = self.get_first_stage_encoding(encoder_posterior).detach()
+    #     return z
+
     @torch.no_grad()
     def get_input(self, batch, k, bs=None, *args, **kwargs):
         x, c = super().get_input(batch, self.first_stage_key, *args, **kwargs)
-        control = batch[self.control_key]
+        hint = batch['hint']
+        source = batch['source']
+        mask = batch['mask']
+
+        hint = einops.rearrange(hint, 'b h w c -> b c h w')
+        source = einops.rearrange(source, 'b h w c -> b c h w')
+
+        # source = self.encode_image(source)
+        # hint = self.encode_image(hint)
+        
+        mask = TF.resize(mask, source.shape[2:], InterpolationMode.NEAREST)
+        mask = mask.unsqueeze(1)
+        
         if bs is not None:
-            control = control[:bs]
-        control = control.to(self.device)
-        control = einops.rearrange(control, 'b h w c -> b c h w')
+            hint = hint[:bs]
+            mask = mask[:bs]
+            source = source[:bs]
+        control = torch.cat([source, hint, mask], dim=1)
         control = control.to(memory_format=torch.contiguous_format).float()
         return x, dict(c_crossattn=[c], c_concat=[control])
 
