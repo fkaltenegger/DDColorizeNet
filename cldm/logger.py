@@ -6,7 +6,7 @@ import torchvision
 from PIL import Image
 from pytorch_lightning.callbacks import Callback
 from pytorch_lightning.utilities.distributed import rank_zero_only
-
+import wandb
 
 class ImageLogger(Callback):
     def __init__(self, batch_frequency=2000, max_images=4, clamp=True, increase_log_steps=True,
@@ -23,6 +23,7 @@ class ImageLogger(Callback):
         self.log_on_batch_idx = log_on_batch_idx
         self.log_images_kwargs = log_images_kwargs if log_images_kwargs else {}
         self.log_first_step = log_first_step
+        wandb.init(name="ColorizeNet")
 
     @rank_zero_only
     def log_local(self, save_dir, split, images, global_step, current_epoch, batch_idx):
@@ -37,7 +38,15 @@ class ImageLogger(Callback):
             filename = "{}_gs-{:06}_e-{:06}_b-{:06}.png".format(k, global_step, current_epoch, batch_idx)
             path = os.path.join(root, filename)
             os.makedirs(os.path.split(path)[0], exist_ok=True)
-            Image.fromarray(grid).save(path)
+            if k == "control":
+                source = grid[:,:,:1]
+                hint = grid[:,:,1:4]
+                mask = grid[:,:,4:5]
+                Image.fromarray(source.squeeze(), mode="L").save(path.replace("control", "control_source"))
+                Image.fromarray(hint).save(path.replace("control", "control_hint"))
+                Image.fromarray(mask.squeeze(), mode="L").save(path.replace("control", "control_mask"))
+            else: 
+                Image.fromarray(grid).save(path)
 
     def log_img(self, pl_module, batch, batch_idx, split="train"):
         check_idx = batch_idx  # if self.log_on_batch_idx else pl_module.global_step
@@ -57,6 +66,8 @@ class ImageLogger(Callback):
             for k in images:
                 N = min(images[k].shape[0], self.max_images)
                 images[k] = images[k][:N]
+                wandb.log({"k": images[k]})
+                
                 if isinstance(images[k], torch.Tensor):
                     images[k] = images[k].detach().cpu()
                     if self.clamp:
