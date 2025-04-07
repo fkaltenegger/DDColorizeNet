@@ -13,14 +13,6 @@ import sys
 import os
 import time
 
-# python3 colorize.py 1 && python3 colorize.py 2 && python3 colorize.py 3 && python3 colorize.py 4 && python3 colorize.py 5 && python3 colorize.py 6 && python3 colorize.py 7 
-# && python3 colorize.py 8 && python3 colorize.py 9 && python3 colorize.py 10 && python3 colorize.py house && python3 colorize.py dog2 && python3 colorize.py building2 && python3 colorize.py human && python3 colorize.py room
-# python3 colorize.py 1 && python3 colorize.py 2 && python3 colorize.py 3 && python3 colorize.py 4 && python3 colorize.py 5 && python3 colorize.py 6 && python3 colorize.py 7 && python3 colorize.py 8 && python3 colorize.py 9 && python3 colorize.py 10  && python3 colorize.py dog2 && python3 colorize.py building2 && python3 colorize.py human 
-# python3 colorize.py 1 && python3 colorize.py 2 && python3 colorize.py 3 && python3 colorize.py 4 && python3 colorize.py 5 && python3 colorize.py 6 && python3 colorize.py 7  && python3 colorize.py dog2 && python3 colorize.py building2 && python3 colorize.py human && python3 colorize.py house && python3 colorize.py room 
-
-# python3 colorize_rework.py 1 && python3 colorize_rework.py 2 && python3 colorize_rework.py 3 && python3 colorize_rework.py 4 && python3 colorize_rework.py 5 && python3 colorize_rework.py 6 && python3 colorize_rework.py 7
-
-# && python3 colorize_rework.py dog2 && python3 colorize_rework.py building2 && python3 colorize_rework.py human && python3 colorize_rework.py house && python3 colorize_rework.py room 
 
 
 _global_model = None
@@ -55,7 +47,6 @@ def colorize_image(
     input_mask=None,
     input_mask_path=None,
     invert_mask=False,
-    # gray_image_path=None,
     
     model_config_path=None,
     model_weights_path=None,
@@ -86,13 +77,6 @@ def colorize_image(
         input_image = HWC3(input_image)
         input_image = resize_image(input_image, resolution)
     H, W, C = input_image.shape
-    
-    # if gray_image_path is None:
-    #     raise ValueError("gray_image_path must be provided")
-    # gray_image = cv2.imread(gray_image_path)
-    # gray_image = HWC3(gray_image)
-    # gray_image = resize_image(gray_image, resolution=resolution)
-    
     
     if input_mask is None:
         if input_mask_path is None:
