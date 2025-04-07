@@ -1,0 +1,1 @@
+wget https://huggingface.co/rsortino/ColorizeNet/resolve/main/colorizenet-sd21.ckpt?download=true -O models/colorizenet-sd21.ckpt
