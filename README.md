@@ -47,6 +47,10 @@ Useful repositories for evaluation:
 - [Learned Perceptual Image Patch Similarity (LPIPS)](https://github.com/richzhang/PerceptualSimilarity)
 - DeltaE CIEDE2000 (from skimage.color import deltaE_ciede2000)
 
+A combined evaluation script is provided <b>/evaluation/compute_metrics.py</b>.
+
+    compute_metrics.py <type> <gt_folder> <col_folder>
+
 
 ## Additional Resources
 This ColorizeNet adaption is based on the [original ColorizeNet repository](https://github.com/rensortino/ColorizeNet) and an integration of the [Differential Diffusion approach](https://differential-diffusion.github.io/).
