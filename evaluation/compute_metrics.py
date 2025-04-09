@@ -346,7 +346,7 @@ def compute_cdr(img_gt, img_pred, kernel_size=5, mask=None):
     return (cdr_a + cdr_b) / 2.0
 
 
-def evaluate_colorization(original_dir, colorized_dir, image_list, use_gpu=True):
+def evaluate_colorization(original_dir, colorized_dir, image_list, use_gpu=True, lvl="lvl2"):
     loss_fn = lpips.LPIPS(net='alex', spatial=False, version='0.1')
     if use_gpu:
         loss_fn.cuda()
